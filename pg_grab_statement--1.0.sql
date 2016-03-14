@@ -44,9 +44,22 @@ CREATE VIEW grab.statements AS
         l.query_start,
         l.total_execution,
         t.name AS query_type,
+        t.modify AS query_modify_data,
         l.query_source,
         l.query_param_values,
         l.query_param_types
     FROM grab.statement_log AS l
         LEFT JOIN pg_catalog.pg_user AS u ON u.usesysid = l.user_id
         LEFT JOIN grab.query_types() AS t ON t.id = l.query_type_id;
+
+COMMENT ON COLUMN grab.statements.transaction IS 'Number of transaction';
+COMMENT ON COLUMN grab.statements.query_number IS 'Number of query of the specific transaction';
+COMMENT ON COLUMN grab.statements.backend_pid IS 'Backend PID';
+COMMENT ON COLUMN grab.statements.username IS 'User name';
+COMMENT ON COLUMN grab.statements.query_start IS 'Timestamp of query execution';
+COMMENT ON COLUMN grab.statements.total_execution IS 'Total time execution (in seconds)';
+COMMENT ON COLUMN grab.statements.query_type IS 'Type of query operation';
+COMMENT ON COLUMN grab.statements.query_modify_data IS 'Is query modify data';
+COMMENT ON COLUMN grab.statements.query_source IS 'Source of the query';
+COMMENT ON COLUMN grab.statements.query_param_values IS 'Parameter values of query';
+COMMENT ON COLUMN grab.statements.query_param_types IS 'Parameter types of query';

@@ -38,7 +38,6 @@ Typical installation procedure may look like this:
 	$ cd pg_grab_statement
 	$ make USE_PGXS=1
 	$ sudo make USE_PGXS=1 install
-	$ make USE_PGXS=1 installcheck
 	$ psql YourDatabaseName -c "CREATE EXTENSION pg_grab_statement;"
 
 
@@ -106,4 +105,55 @@ Recorded data
  query_source       | text                     |           | extended |              | Source of the query
  query_param_values | text[]                   |           | extended |              | Parameter values of query
  query_param_types  | regtype[]                |           | extended |              | Parameter types of query
+```
+
+Defenition of query operation types
+-----------------------------------
+```
+=# select * from grab.query_types();
+ id | modify |  name
+----+--------+---------
+  0 | t      | UNKNOWN
+  1 | f      | SELECT
+  2 | t      | UPDATE
+  3 | t      | INSERT
+  4 | t      | DELETE
+  5 | t      | UTILITY
+  6 | t      | NOTHING
+(7 rows)
+```
+
+User view
+---------
+```
+=# \d+ grab.statements
+                                               View "grab.statements"
+       Column       |           Type           | Modifiers | Storage  |                 Description
+--------------------+--------------------------+-----------+----------+---------------------------------------------
+ transaction        | integer                  |           | plain    | Number of transaction
+ query_number       | integer                  |           | plain    | Number of query of the specific transaction
+ backend_pid        | integer                  |           | plain    | Backend PID
+ username           | name                     |           | plain    | User name
+ query_start        | timestamp with time zone |           | plain    | Timestamp of query execution
+ total_execution    | double precision         |           | plain    | Total time execution (in seconds)
+ query_type         | text                     |           | extended | Type of query operation
+ query_modify_data  | boolean                  |           | plain    | Is query modify data
+ query_source       | text                     |           | extended | Source of the query
+ query_param_values | text[]                   |           | extended | Parameter values of query
+ query_param_types  | regtype[]                |           | extended | Parameter types of query
+View definition:
+ SELECT l.transaction_id AS transaction,
+    l.query_id AS query_number,
+    l.process_id AS backend_pid,
+    u.usename AS username,
+    l.query_start,
+    l.total_execution,
+    t.name AS query_type,
+    t.modify AS query_modify_data,
+    l.query_source,
+    l.query_param_values,
+    l.query_param_types
+   FROM grab.statement_log l
+     LEFT JOIN pg_user u ON u.usesysid = l.user_id::oid
+     LEFT JOIN grab.query_types() t(id, modify, name) ON t.id = l.query_type_id;
 ```
