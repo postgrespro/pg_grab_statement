@@ -1,5 +1,6 @@
 # pg_statement_grab extension
 comment = 'Grab SQL statements'
 default_version = '1.0'
-module_pathname = '$libdir/pg_statement_grab'
-relocatable = true
+module_pathname = '$libdir/pg_grab_statement'
+relocatable = false
+schema = 'grab'
