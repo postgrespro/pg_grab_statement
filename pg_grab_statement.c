@@ -206,6 +206,8 @@ grab_ExecutorEnd(QueryDesc * queryDesc)
 				int16           elem_val_len, elem_typ_len;
 				int             elem_dims[1], elem_lbs[1];
 
+				int paramno;
+
 				/* init */
 				out_functions = (FmgrInfo *) palloc(
 					    (numParams) * sizeof(FmgrInfo));
@@ -214,7 +216,7 @@ grab_ExecutorEnd(QueryDesc * queryDesc)
 				elem_dims[0] = arr_nelems;
 				elem_lbs[0] = 1;
 
-				for (int paramno = 0; paramno < numParams; paramno++) {
+				for (paramno = 0; paramno < numParams; paramno++) {
 					pvalue = queryDesc->params->params[paramno].value;
 					ptype = queryDesc->params->params[paramno].ptype;
 					getTypeOutputInfo(ptype, &out_func_oid, &isvarlena);
